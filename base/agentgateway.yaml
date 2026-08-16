@@ -1,0 +1,49 @@
+
+# Gateway for the upstreambeat-newsroom-gateway team, founded by upstreambeat-anchor.
+#
+# Declared HERE, in the agent's own gitops repo — NOT minted by the
+# operator — so the gateway is a first-class, declarative resource that's
+# reversible by deleting it. The AgentWorkstation's
+# runtime.shared.gatewayRef points at this gateway by name.
+#
+# Nobody "owns" this via ownerReferences: its lifecycle is git/ArgoCD.
+# Pruning this repo removes BOTH the agent and this gateway (the
+# AgentGateway controller cascades its own Pod / PVC / Service / Route).
+#
+# A new team starts as "a gateway with one agent" — point another
+# AgentWorkstation's gatewayRef at "upstreambeat-newsroom-gateway" and it
+# joins this same gateway pod. The operator treats that identically to
+# any shared agent; there is no dedicated-vs-shared code path.
+#
+# namespace + commonLabels are applied by base/kustomization.yaml.
+apiVersion: agentoffice.ai/v1alpha1
+kind: AgentGateway
+metadata:
+  # Named for the TEAM, not the founding agent, so the second agent to
+  # arrive reads as a colleague rather than a guest in someone's gateway.
+  name: upstreambeat-newsroom-gateway
+spec:
+  displayName: Anchor — upstreambeat.ai editor-in-chief
+  description: "Dedicated gateway for agent upstreambeat-anchor"
+  # Same OpenClaw runtime image the AgentWorkstation pins, so the
+  # dedicated pod matches the agent's intended runtime.
+  image: quay-quay-quay-test.apps.salamander.aimlworkbench.com/deanpeterson/openclaw:v2026.7.1
+  # Codex-backed agent: the gateway pod reads ~/.codex/auth.json from the
+  # cluster-managed Codex subscription secret (the same ESO-synced secret
+  # research-gateway uses). The agent never sees raw credentials.
+  codexCredentialsSecretRef: codex-subscription-credentials
+  # Bill turns to the subscription, never a metered API key.
+  #
+  # OpenClaw 2026.7.x folded provider `openai-codex` into canonical
+  # `openai`, so one gateway config can describe only ONE OpenAI route.
+  # Without this the operator has to infer the route, and OpenClaw
+  # resolves the credential implicitly — which is how agent traffic
+  # silently landed on per-token billing. mode: subscription makes the
+  # operator render chatgpt.com/backend-api, omit apiKey entirely, and
+  # pin auth.order to the OAuth profile.
+  #
+  # Requires agent-office-operator >= v1.7.6. (The operator would infer
+  # `subscription` from codexCredentialsSecretRef above, but stating it
+  # keeps the billing route readable in git.)
+  modelAuth:
+    mode: subscription
