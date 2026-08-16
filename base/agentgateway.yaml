@@ -31,7 +31,12 @@ spec:
   # Codex-backed agent: the gateway pod reads ~/.codex/auth.json from the
   # cluster-managed Codex subscription secret (the same ESO-synced secret
   # research-gateway uses). The agent never sees raw credentials.
-  codexCredentialsSecretRef: codex-subscription-credentials
+  # DEDICATED grant for this newsroom (Secret upstreambeat-codex-credentials,
+  # minted via `CODEX_HOME=~/.codex-upstreambeat codex login`). Never point a
+  # second gateway at the shared codex-subscription-credentials lineage:
+  # ChatGPT OAuth refresh tokens rotate on use and the second consumer burns
+  # whichever refreshes second ("refresh token has already been used").
+  codexCredentialsSecretRef: upstreambeat-codex-credentials
   # Bill turns to the subscription, never a metered API key.
   #
   # OpenClaw 2026.7.x folded provider `openai-codex` into canonical
