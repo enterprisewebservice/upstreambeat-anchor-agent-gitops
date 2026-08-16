@@ -32,6 +32,16 @@ spec:
   # cluster-managed Codex subscription secret (the same ESO-synced secret
   # research-gateway uses). The agent never sees raw credentials.
   codexCredentialsSecretRef: codex-subscription-credentials
+  # The real browser. A node-host on the KubeVirt VM (unit
+  # openclaw-nodehost-upstreambeat.service on default/fedora-black-zebra-36)
+  # dials this gateway with display name fedora-black-zebra-36-upstreambeat;
+  # the operator auto-approves the pairing request whose display name
+  # contains nodeHostRef.name (autoApproveNodeHost). Without it, agents can
+  # web_fetch a page's HTML shell but not render redhat.com /
+  # developers.redhat.com (React) or anything behind JavaScript.
+  nodeHostRef:
+    name: fedora-black-zebra-36-upstreambeat
+    namespace: default
   # Bill turns to the subscription, never a metered API key.
   #
   # OpenClaw 2026.7.x folded provider `openai-codex` into canonical
