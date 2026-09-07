@@ -23,6 +23,10 @@ metadata:
   # arrive reads as a colleague rather than a guest in someone's gateway.
   name: upstreambeat-newsroom-gateway
 spec:
+  # live quick take: the voice worker in upstreambeat reaches the anchor through this
+  # OpenAI-compatible surface (/v1/chat/completions, model target openclaw/upstreambeat-anchor)
+  http:
+    chatCompletions: true
   displayName: Anchor — upstreambeat.ai editor-in-chief
   description: "Dedicated gateway for agent upstreambeat-anchor"
   # Same OpenClaw runtime image the AgentWorkstation pins, so the
