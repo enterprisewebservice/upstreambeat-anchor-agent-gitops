@@ -32,10 +32,12 @@ spec:
   # Same OpenClaw runtime image the AgentWorkstation pins, so the
   # dedicated pod matches the agent's intended runtime.
   image: quay-quay-quay-test.apps.salamander.aimlworkbench.com/deanpeterson/openclaw:v2026.7.1
-  # Codex-backed agent: the gateway pod reads ~/.codex/auth.json from the
-  # cluster-managed Codex subscription secret (the same ESO-synced secret
-  # research-gateway uses). The agent never sees raw credentials.
-  codexCredentialsSecretRef: codex-subscription-credentials
+  # Codex-backed agent with its own sign-in: upstreambeat-newsroom-gateway-codex-credentials is
+  # synced by ESO from Vault agent-office/codex/upstreambeat-newsroom-gateway (agent-office
+  # cluster/secrets/codex-gateway-credentials.yaml). Never share one sign-in
+  # between gateways: Codex refresh tokens are single-use, so two holders cut
+  # each other off. The agent never sees raw credentials.
+  codexCredentialsSecretRef: upstreambeat-newsroom-gateway-codex-credentials
   # The real browser. A node-host on the KubeVirt VM (unit
   # openclaw-nodehost-upstreambeat.service on default/fedora-black-zebra-36)
   # dials this gateway with display name fedora-black-zebra-36-upstreambeat;
